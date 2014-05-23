@@ -1,0 +1,27 @@
+nodeName: IMDB1
+
+minDelayMs: 10
+maxDelayMs: 3000
+failureSeed: 300
+responseTTLMin: 5
+responsesMaxCnt: 200000
+
+basePath: http://localhost:8082
+
+logging:
+  level: INFO
+
+  loggers:
+    "io.dropwizard.setup.AdminEnvironment": WARN
+
+server:
+  applicationConnectors:
+      - type: http
+        port: 8082
+#        urlPattern: /service/*  # Default is /*
+
+  adminConnectors:
+    - type: http
+      port: 8092
+#  requestLog:
+#    appenders: []

@@ -1,0 +1,20 @@
+nodeName: IMDB2
+
+minDelayMs: 10
+maxDelayMs: 3000
+failureSeed: 300
+responseTTLMin: 5
+responsesMaxCnt: 200000
+
+basePath: http://imdb.archeus.ro:8080
+
+logging:
+  level: INFO
+
+server:
+  applicationConnectors:
+      - type: http
+        port: 8090
+  adminConnectors:
+    - type: http
+      port: 8091
