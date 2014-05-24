@@ -53,5 +53,6 @@
 
     <bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
     <bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper" />
+    <bean id="parser" class="jackson.Parser" />
 
 </beans>

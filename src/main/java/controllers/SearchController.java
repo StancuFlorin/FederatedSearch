@@ -1,19 +1,20 @@
 package controllers;
 
-import exceptions.QueryException;
+import jackson.Parser;
 import jackson.imdb.Movie;
-import jackson.imdb.Query;
 import jackson.tracktv.TrackTV;
-import jpa.service.ShowService;
+import jackson.tvrage.Show;
+import jpa.models.MovieModel;
+import jpa.service.MovieService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import rest.RestClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -25,83 +26,87 @@ import java.util.List;
 public class SearchController {
 
     @Autowired
-    RestClient restClient;
+    Parser parser;
 
     @Autowired
-    ShowService showService;
+    MovieService movieService;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    public Movie[] getIMDBData(String query) {
+    @RequestMapping(method = RequestMethod.POST)
+    public String search(@RequestParam String name, ModelMap model) {
 
-        ResponseEntity<String> responseEntity = null;
+        TrackTV trackTV = parser.getTrackTVData(name);
+        List<MovieModel> movieModelListTrackTV = new ArrayList<MovieModel>();
+        if (trackTV != null)
+            for (MovieModel movieModel : trackTV.toJPAModel())
+                movieModelListTrackTV.add(movieModel);
 
-        try {
-            responseEntity = restClient.jsonToObject("http://localhost:8082/movies/" + query);
-        } catch (QueryException e) {
-            e.printStackTrace();
-        }
+        Movie[] movies = parser.getIMDBData(name);
+        List<MovieModel> movieModelListIMDB = new ArrayList<MovieModel>();
+        if (movies != null)
+            for (Movie movie : movies)
+                movieModelListIMDB.add(movie.toJPAModel());
+/*
+        for (MovieModel movieModel : movieModelList)
+            movieService.save(movieModel);
+*/
 
-        Query queryJSONObject = null;
-        try {
-            queryJSONObject = objectMapper.readValue(responseEntity.getBody(), Query.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // urmeaza sa fac interclasarea
 
-        while(true) {
+        List<MovieModel> movieModelList = new ArrayList<MovieModel>();
 
-            try {
-                responseEntity = restClient.jsonToObject(queryJSONObject.getDetail());
-            } catch (QueryException e) {
-                e.printStackTrace();
+        Iterator<MovieModel> movieModelListTrackTVIterator = movieModelListTrackTV.iterator();
+        while (movieModelListTrackTVIterator.hasNext()) {
+
+            MovieModel movieModelTrackTV = movieModelListTrackTVIterator.next();
+
+            Iterator<MovieModel> movieModelListIMDBIterator = movieModelListIMDB.iterator();
+            while (movieModelListIMDBIterator.hasNext()) {
+
+                MovieModel movieModelIMDB = movieModelListIMDBIterator.next();
+
+                if (movieModelTrackTV.equals(movieModelIMDB)) {
+                    movieModelTrackTV.merge(movieModelIMDB);
+                    movieModelListIMDBIterator.remove();
+                    break;
+                }
+
             }
 
-            if (responseEntity.getStatusCode().value() == 200)
-                break;
-
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            movieModelList.add(movieModelTrackTV);
 
         }
 
-        Movie[] movies = null;
+        movieModelList.addAll(movieModelListIMDB);
 
-        try {
-            movies = objectMapper.readValue(responseEntity.getBody(), Movie[].class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // sfarsit de interclasare
 
-        return movies;
+        model.addAttribute("title", "Search");
+        model.addAttribute("query", name);
+        model.addAttribute("movies", movieModelList);
+
+        return "list";
 
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/callback", method = RequestMethod.POST)
     @ResponseBody
-    public Movie[] search(@RequestParam String name, ModelMap model) {
+    public Show[] callback(@RequestBody String showInfos, ModelMap model) {
 
-        // "http://localhost:8081/tracktv?query=" + name
+        Show[] shows = null;
 
+        try {
+            shows = objectMapper.readValue(showInfos, Show[].class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        return getIMDBData(name);
+        System.out.println(showInfos);
 
-/*
-            TrackTV TrackTV = responseEntity.getBody();
+        return shows;
 
-            List<ShowModel> showModelList = trackTV.toJPAModel();
-            if (showModelList.isEmpty())
-                return null;
-
-            for (ShowModel showModel : showModelList)
-                showService.save(showModel);
-
-            return TrackTV;
-*/
     }
 
     @RequestMapping(method = RequestMethod.GET)

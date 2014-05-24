@@ -18,15 +18,13 @@ public class TrackTV {
 
     public TrackTV() {}
 
-    public List<ShowModel> toJPAModel() {
+    public List<MovieModel> toJPAModel() {
 
-        List<ShowModel> showModelList = new ArrayList<ShowModel>();
+        List<MovieModel> movieModelList = new ArrayList<MovieModel>();
+        for (Show show : this.content)
+            movieModelList.add(show.toJPAModel());
 
-        for (Show show : content) {
-            showModelList.add(show.toJPAModel());
-        }
-
-        return showModelList;
+        return movieModelList;
 
     }
 

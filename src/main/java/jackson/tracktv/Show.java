@@ -1,13 +1,7 @@
 package jackson.tracktv;
 
-import jpa.models.EpisodeModel;
-import jpa.models.GenreModel;
-import jpa.models.ShowModel;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import jpa.models.MovieModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,16 +12,16 @@ import java.util.List;
 public class Show {
 
     private String title;
-    /*
+
     private int year;
     private String url;
-/*
+
     private String country;
     private String overview;
     private String status;
     private String network;
     private String poster;
-/*
+
     private List<String> genres;
     private People people;
 
@@ -36,59 +30,39 @@ public class Show {
     private String imdb_id;
     private String tvrage_id;
 
-    private Collection<Episode> top_episodes;
-*/
-    public Show() {}
+    private List<Episode> top_episodes;
 
-    /*
-        TODO - adauga functionalitati pentru actors
-     */
+    public MovieModel toJPAModel() {
 
-    public ShowModel toJPAModel() {
+        MovieModel movieModel = new MovieModel();
 
-        ShowModel showModel = new ShowModel();
-        showModel.setTitle(this.title);
-        /*
-        showModel.setYear(this.year);
+        movieModel.setTitle(this.title);
+        movieModel.setYear(this.year + "");
+        movieModel.setTrackTVURL(this.url);
+        movieModel.setCountry(this.country);
+        movieModel.setPlot(this.overview);
+        movieModel.setStatus(this.status);
+        movieModel.setNetwork(this.network);
+        movieModel.setPoster(this.poster);
 
-        showModel.setUrl(this.url);
-        showModel.setCountry(this.country);
-        showModel.setOverview(this.overview);
-        showModel.setStatus(this.status);
-        showModel.setNetwork(this.network);
-        showModel.setPoster(this.poster);
-
-        showModel.setAirDay(this.air_day);
-        showModel.setAirTime(this.air_time);
-        showModel.setImdbID(this.imdb_id);
-        showModel.setTvrageID(this.tvrage_id);
-
-        Collection<GenreModel> genreModelCollection = new ArrayList<GenreModel>();
+        StringBuilder stringBuilderGenres = new StringBuilder();
         for (String genre : this.genres) {
-
-            GenreModel genreModel = new GenreModel();
-            genreModel.setName(genre);
-            genreModelCollection.add(genreModel);
-
+            stringBuilderGenres.append(genre);
+            stringBuilderGenres.append(", ");
         }
+        stringBuilderGenres.setLength(stringBuilderGenres.length() - 2);
+        movieModel.setGenre(stringBuilderGenres.toString());
 
-        //showModel.setGenres(genreModelCollection);
+        movieModel.setAirDay(this.air_day);
+        movieModel.setAirTime(this.air_time);
+        movieModel.setImdbID(this.imdb_id);
+        movieModel.setTvrageID(this.tvrage_id);
 
-        Collection<EpisodeModel> episodeModelCollection = new ArrayList<EpisodeModel>();
-        for (Episode episode : this.top_episodes) {
-
-            EpisodeModel episodeModel = episode.toJPAModel();
-            //episodeModel.setShow(showModel);
-            episodeModelCollection.add(episodeModel);
-            break;
-
-        }
-
-        //showModel.setEpisodes(episodeModelCollection);
-*/
-        return showModel;
+        return movieModel;
 
     }
+
+    public Show() {}
 
     public String getTitle() {
         return title;
@@ -97,7 +71,7 @@ public class Show {
     public void setTitle(String title) {
         this.title = title;
     }
-/*
+
     public int getYear() {
         return year;
     }
@@ -113,7 +87,7 @@ public class Show {
     public void setUrl(String url) {
         this.url = url;
     }
-/*
+
     public String getCountry() {
         return country;
     }
@@ -153,7 +127,7 @@ public class Show {
     public void setPoster(String poster) {
         this.poster = poster;
     }
-/*
+
     public List<String> getGenres() {
         return genres;
     }
@@ -194,11 +168,11 @@ public class Show {
         this.tvrage_id = tvrage_id;
     }
 
-    public Collection<Episode> getTop_episodes() {
+    public List<Episode> getTop_episodes() {
         return top_episodes;
     }
 
-    public void setTop_episodes(Collection<Episode> top_episodes) {
+    public void setTop_episodes(List<Episode> top_episodes) {
         this.top_episodes = top_episodes;
     }
 
@@ -209,5 +183,5 @@ public class Show {
     public void setPeople(People people) {
         this.people = people;
     }
-*/
+
 }

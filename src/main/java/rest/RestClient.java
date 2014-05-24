@@ -4,6 +4,8 @@ import exceptions.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -18,14 +20,25 @@ public class RestClient {
 
     public ResponseEntity<String> jsonToObject(String url) throws QueryException {
 
-        ResponseEntity<String> responseEntity = this.restTemplate.getForEntity(url, String.class);
+        ResponseEntity<String> responseEntity = null;
 
-        int statusCode = responseEntity.getStatusCode().value();
+        try {
+            responseEntity = this.restTemplate.getForEntity(url, String.class);
 
-        if (statusCode == 406)
-            throw new QueryException("Query is not valid!");
-        else if (statusCode == 410)
-            throw new QueryException("Reference is not valid!");
+            int statusCode = responseEntity.getStatusCode().value();
+
+            if (statusCode == 406)
+                throw new QueryException("Query is not valid!");
+            else if (statusCode == 410)
+                throw new QueryException("Reference is not valid!");
+            else if (statusCode == 404)
+                throw new QueryException("Resource not found!");
+
+        } catch (ResourceAccessException e) {
+            throw new QueryException("Connection refused!");
+        } catch (HttpClientErrorException e) {
+            throw new QueryException("Resource not found!");
+        }
 
         return responseEntity;
 

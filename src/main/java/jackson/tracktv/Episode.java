@@ -1,6 +1,5 @@
 package jackson.tracktv;
 
-import jpa.models.EpisodeModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
@@ -17,21 +16,6 @@ public class Episode {
     private String url;
 
     public Episode() {}
-
-    public EpisodeModel toJPAModel() {
-
-        EpisodeModel episodeModel = new EpisodeModel();
-
-        episodeModel.setPlays(this.plays);
-        /*
-        episodeModel.setSeason(this.season);
-        episodeModel.setNumber(this.number);
-        episodeModel.setTitle(this.title);
-        episodeModel.setUrl(this.url);
-           */
-        return episodeModel;
-
-    }
 
     public int getPlays() {
         return plays;

@@ -1,5 +1,6 @@
 package jackson.imdb;
 
+import jpa.models.MovieModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
@@ -72,6 +73,27 @@ public class Movie {
     private String writer;
 
     public Movie() {}
+
+    public MovieModel toJPAModel() {
+
+        MovieModel movieModel = new MovieModel();
+
+        movieModel.setTitle(this.title);
+        movieModel.setYear(this.year);
+        movieModel.setCountry(this.country);
+        movieModel.setGenre(this.genre);
+        movieModel.setImdbID(this.imdbID);
+        movieModel.setImdbRating(this.imdbRating);
+        movieModel.setImdbVotes(this.imdbVotes);
+        movieModel.setLanguage(this.language);
+        movieModel.setPlot(this.plot);
+        movieModel.setPoster(this.poster);
+        movieModel.setRated(this.rated);
+        movieModel.setRuntime(this.runtime);
+
+        return movieModel;
+
+    }
 
     public String getTitle() {
         return title;
