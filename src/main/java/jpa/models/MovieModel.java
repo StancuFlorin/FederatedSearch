@@ -1,15 +1,13 @@
 package jpa.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "movies")
+@Table(name = "movies", uniqueConstraints = {@UniqueConstraint(columnNames = "id")})
 public class MovieModel {
 
     @Id
+    @GeneratedValue
     private int id;
 
     private String title;
@@ -103,6 +101,11 @@ public class MovieModel {
 
         if (this.imdbID != null) {
             if (this.imdbID.equals(otherMovieModel.getImdbID()))
+                return true;
+        }
+
+        if (this.tvrageID != null) {
+            if (this.tvrageID.equals(otherMovieModel.getTvrageID()))
                 return true;
         }
 
@@ -274,4 +277,5 @@ public class MovieModel {
     public void setImdbVotes(String imdbVotes) {
         this.imdbVotes = imdbVotes;
     }
+
 }

@@ -5,15 +5,18 @@ import jackson.imdb.Movie;
 import jackson.tracktv.TrackTV;
 import jackson.tvrage.Show;
 import jpa.models.MovieModel;
+import jpa.models.QueryModel;
 import jpa.service.MovieService;
+import jpa.service.QueryService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import rest.Response;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,80 +35,117 @@ public class SearchController {
     MovieService movieService;
 
     @Autowired
+    QueryService queryService;
+
+    @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    Response response;
 
     @RequestMapping(method = RequestMethod.POST)
     public String search(@RequestParam String name, ModelMap model) {
 
-        TrackTV trackTV = parser.getTrackTVData(name);
-        List<MovieModel> movieModelListTrackTV = new ArrayList<MovieModel>();
-        if (trackTV != null)
-            for (MovieModel movieModel : trackTV.toJPAModel())
-                movieModelListTrackTV.add(movieModel);
+        List<MovieModel> movieModelList = new ArrayList<MovieModel>();;
 
-        Movie[] movies = parser.getIMDBData(name);
-        List<MovieModel> movieModelListIMDB = new ArrayList<MovieModel>();
-        if (movies != null)
-            for (Movie movie : movies)
-                movieModelListIMDB.add(movie.toJPAModel());
-/*
-        for (MovieModel movieModel : movieModelList)
-            movieService.save(movieModel);
-*/
+        QueryModel queryModel = queryService.find(name);
 
-        // urmeaza sa fac interclasarea
+        if (queryModel == null) {
 
-        List<MovieModel> movieModelList = new ArrayList<MovieModel>();
+            parser.getTVRageData(name);
 
-        Iterator<MovieModel> movieModelListTrackTVIterator = movieModelListTrackTV.iterator();
-        while (movieModelListTrackTVIterator.hasNext()) {
+            TrackTV trackTV = parser.getTrackTVData(name);
+            List<MovieModel> movieModelListTrackTV = new ArrayList<MovieModel>();
+            if (trackTV != null)
+                for (MovieModel movieModel : trackTV.toJPAModel())
+                    movieModelListTrackTV.add(movieModel);
 
-            MovieModel movieModelTrackTV = movieModelListTrackTVIterator.next();
+            Movie[] movies = parser.getIMDBData(name);
+            List<MovieModel> movieModelListIMDB = new ArrayList<MovieModel>();
+            if (movies != null)
+                for (Movie movie : movies)
+                    movieModelListIMDB.add(movie.toJPAModel());
 
-            Iterator<MovieModel> movieModelListIMDBIterator = movieModelListIMDB.iterator();
-            while (movieModelListIMDBIterator.hasNext()) {
+            String data = response.get(name);
+            List<MovieModel> movieModelListTVRage = new ArrayList<MovieModel>();
+            if (data != null) {
 
-                MovieModel movieModelIMDB = movieModelListIMDBIterator.next();
+                Show[] shows = parser.parseTVRageData(data);
+                for (Show show : shows)
+                    movieModelListTVRage.add(show.toJPAModel());
 
-                if (movieModelTrackTV.equals(movieModelIMDB)) {
-                    movieModelTrackTV.merge(movieModelIMDB);
-                    movieModelListIMDBIterator.remove();
-                    break;
+            }
+
+            // urmeaza sa fac interclasarea
+
+            Iterator<MovieModel> movieModelListTrackTVIterator = movieModelListTrackTV.iterator();
+            while (movieModelListTrackTVIterator.hasNext()) {
+
+                MovieModel movieModelTrackTV = movieModelListTrackTVIterator.next();
+
+                Iterator<MovieModel> movieModelListIMDBIterator = movieModelListIMDB.iterator();
+                while (movieModelListIMDBIterator.hasNext()) {
+
+                    MovieModel movieModelIMDB = movieModelListIMDBIterator.next();
+
+                    if (movieModelTrackTV.equals(movieModelIMDB)) {
+                        movieModelTrackTV.merge(movieModelIMDB);
+                        movieModelListIMDBIterator.remove();
+                        break;
+                    }
+
+                }
+
+                movieModelList.add(movieModelTrackTV);
+
+            }
+
+            movieModelList.addAll(movieModelListIMDB);
+
+            Iterator<MovieModel> movieModelListIterator = movieModelList.iterator();
+            while (movieModelListIterator.hasNext()) {
+
+                MovieModel movieModel = movieModelListIterator.next();
+
+                Iterator<MovieModel> movieModelListTVRageIterator = movieModelListTVRage.iterator();
+                while (movieModelListTVRageIterator.hasNext()) {
+
+                    MovieModel movieModelTVRage = movieModelListTVRageIterator.next();
+
+                    if (movieModel.equals(movieModelTVRage)) {
+                        movieModel.merge(movieModelTVRage);
+                        movieModelListTVRageIterator.remove();
+                        break;
+                    }
+
                 }
 
             }
 
-            movieModelList.add(movieModelTrackTV);
+            movieModelList.addAll(movieModelListTVRage);
+
+            // sfarsit de interclasare
+
+            queryModel = new QueryModel();
+            queryModel.setQuery(name);
+            queryModel.setDate(new Date());
+
+            queryModel.setMovies(movieModelList);
+            queryService.save(queryModel);
+
+        } else {
+
+            movieModelList = queryModel.getMovies();
+            if (movieModelList == null)
+                movieModelList = new ArrayList<MovieModel>();
 
         }
-
-        movieModelList.addAll(movieModelListIMDB);
-
-        // sfarsit de interclasare
 
         model.addAttribute("title", "Search");
         model.addAttribute("query", name);
         model.addAttribute("movies", movieModelList);
 
         return "list";
-
-    }
-
-    @RequestMapping(value = "/callback", method = RequestMethod.POST)
-    @ResponseBody
-    public Show[] callback(@RequestBody String showInfos, ModelMap model) {
-
-        Show[] shows = null;
-
-        try {
-            shows = objectMapper.readValue(showInfos, Show[].class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(showInfos);
-
-        return shows;
 
     }
 

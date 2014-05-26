@@ -4,10 +4,12 @@ import exceptions.QueryException;
 import jackson.imdb.Movie;
 import jackson.imdb.Query;
 import jackson.tracktv.TrackTV;
+import jackson.tvrage.Show;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import rest.RestClient;
 
 import java.io.IOException;
@@ -24,6 +26,20 @@ public class Parser {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    public Show[] parseTVRageData(String data) {
+
+        Show[] shows = null;
+
+        try {
+            shows = objectMapper.readValue(data, Show[].class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return shows;
+
+    }
 
     /**
      *
@@ -128,6 +144,38 @@ public class Parser {
         }
 
         return trackTV;
+
+    }
+
+    public void getTVRageData(String query) {
+
+        ResponseEntity<String> responseEntity = null;
+
+        // trimitem cererea
+
+        while(true) {
+
+            try {
+                responseEntity = restClient.jsonToObject("http://localhost:8083/tvrage/query/" + query + "?callback=http://localhost:8080/callback?queried_for=" + query);
+            } catch (QueryException e) {
+                e.printStackTrace();
+            } catch (HttpServerErrorException e) {
+                e.printStackTrace();
+            }
+
+            if (responseEntity == null)
+                return;
+
+            if (responseEntity.getStatusCode().value() == 200)
+                break;
+
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
 
     }
 

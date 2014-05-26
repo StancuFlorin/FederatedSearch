@@ -1,5 +1,6 @@
 package jackson.tvrage;
 
+import jpa.models.MovieModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -27,6 +28,24 @@ public class Show {
     private Network network;
 
     public Show() {}
+
+    public MovieModel toJPAModel() {
+
+        MovieModel movieModel = new MovieModel();
+
+        movieModel.setAirTime(this.airtime);
+        movieModel.setTvrageID(this.showid);
+        movieModel.setStatus(this.status);
+        movieModel.setRuntime(this.runtime);
+        movieModel.setAirDay(this.airday);
+        movieModel.setCountry(this.originCountry);
+        movieModel.setReleased(this.startdate);
+        movieModel.setTitle(this.showname);
+        movieModel.setYear(this.started);
+
+        return movieModel;
+
+    }
 
     public String getAirtime() {
         return airtime;
