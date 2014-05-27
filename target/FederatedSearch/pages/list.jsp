@@ -95,4 +95,12 @@
     </tbody>
 </table>
 
+<ul class="pagination">
+    <li><a href="#">&laquo;</a></li>
+    <c:forEach var="i" begin="1" end="${pages}">
+        <li><a href="/search/results?query=${param["query"]}&page=${i}">${i}</a></li>
+    </c:forEach>
+    <li><a href="#">&raquo;</a></li>
+</ul>
+
 <jsp:include page="footer.jsp" />

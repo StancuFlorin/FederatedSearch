@@ -17,6 +17,7 @@ import java.util.List;
 public class QueryModel {
 
     @Id
+    @GeneratedValue
     private int id;
 
     private String query;

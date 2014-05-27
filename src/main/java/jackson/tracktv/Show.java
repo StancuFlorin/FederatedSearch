@@ -50,7 +50,8 @@ public class Show {
             stringBuilderGenres.append(genre);
             stringBuilderGenres.append(", ");
         }
-        stringBuilderGenres.setLength(stringBuilderGenres.length() - 2);
+        if (stringBuilderGenres.length() != 0)
+            stringBuilderGenres.setLength(stringBuilderGenres.length() - 2);
         movieModel.setGenre(stringBuilderGenres.toString());
 
         movieModel.setAirDay(this.air_day);

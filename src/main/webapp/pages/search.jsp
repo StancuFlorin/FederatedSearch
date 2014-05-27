@@ -2,11 +2,11 @@
 
 <h1 class="page-header">${title}</h1>
 
-<form class="form-horizontal" role="form" method="post" action="/search">
+<form class="form-horizontal" role="form" method="get" action="/search/results">
     <div class="form-group">
         <label for="inputName" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-            <input type="test" class="form-control" id="inputName" placeholder="Name" name="name">
+            <input type="test" class="form-control" id="inputName" placeholder="Name" name="query">
         </div>
     </div>
     <div class="form-group">

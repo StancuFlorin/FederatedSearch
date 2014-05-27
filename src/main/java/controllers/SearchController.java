@@ -43,30 +43,53 @@ public class SearchController {
     @Autowired
     Response response;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public String search(@RequestParam String name, ModelMap model) {
+    @RequestMapping(value = "/results", method = RequestMethod.GET)
+    public String search(@RequestParam String query, @RequestParam(required = false) String page, ModelMap model) {
 
-        List<MovieModel> movieModelList = new ArrayList<MovieModel>();;
+        int pageNumber = 0;
+        try {
+            pageNumber = Integer.parseInt(page);
+        } catch (NumberFormatException e) {
+            pageNumber = 0;
+        }
 
-        QueryModel queryModel = queryService.find(name);
+        System.out.println(pageNumber);
+
+        List<MovieModel> movieModelList = new ArrayList<MovieModel>();
+
+        QueryModel queryModel = queryService.find(query);
+
+        if (queryModel != null) {
+
+            Date date = new Date();
+            Long minutes = (date.getTime() - queryModel.getDate().getTime()) / (1000 * 60);
+
+            if (minutes > 15) {
+
+                queryService.remove(queryModel);
+                queryModel = null;
+
+            }
+
+        }
 
         if (queryModel == null) {
 
-            parser.getTVRageData(name);
+            parser.getTVRageData(query);
 
-            TrackTV trackTV = parser.getTrackTVData(name);
+            TrackTV trackTV = parser.getTrackTVData(query);
             List<MovieModel> movieModelListTrackTV = new ArrayList<MovieModel>();
             if (trackTV != null)
                 for (MovieModel movieModel : trackTV.toJPAModel())
                     movieModelListTrackTV.add(movieModel);
 
-            Movie[] movies = parser.getIMDBData(name);
+            Movie[] movies = parser.getIMDBData(query);
             List<MovieModel> movieModelListIMDB = new ArrayList<MovieModel>();
             if (movies != null)
                 for (Movie movie : movies)
                     movieModelListIMDB.add(movie.toJPAModel());
 
-            String data = response.get(name);
+            String data = response.get(query);
             List<MovieModel> movieModelListTVRage = new ArrayList<MovieModel>();
             if (data != null) {
 
@@ -127,7 +150,7 @@ public class SearchController {
             // sfarsit de interclasare
 
             queryModel = new QueryModel();
-            queryModel.setQuery(name);
+            queryModel.setQuery(query);
             queryModel.setDate(new Date());
 
             queryModel.setMovies(movieModelList);
@@ -141,9 +164,35 @@ public class SearchController {
 
         }
 
+        int itemsPage = 10;
+
+        if (pageNumber <= 1)
+            pageNumber = 0;
+        else
+            pageNumber--;
+
+        int start = itemsPage * pageNumber;
+        int end = itemsPage * (pageNumber + 1);
+        if (end > movieModelList.size())
+            end = movieModelList.size();
+
+        if (start > end) {
+            start = end;
+        }
+
+        int items = movieModelList.size();
+        int pages = items / itemsPage;
+        if (items % itemsPage != 0)
+            pages++;
+
+        List<MovieModel> movieModelList2 = movieModelList.subList(start, end);
+
         model.addAttribute("title", "Search");
-        model.addAttribute("query", name);
-        model.addAttribute("movies", movieModelList);
+        model.addAttribute("query", query);
+        model.addAttribute("pages", pages);
+        model.addAttribute("query", query);
+        model.addAttribute("page", pageNumber + 1);
+        model.addAttribute("movies", movieModelList2);
 
         return "list";
 

@@ -38,7 +38,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Federated Search</a>
+                <a class="navbar-brand" href="/">Federated Search</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -66,9 +66,9 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="../navbar/">Default</a></li>
-                    <li><a href="../navbar-static-top/">Static top</a></li>
-                    <li class="active"><a href="./">Fixed top</a></li>
+                    <li><a href="#">Default</a></li>
+                    <li><a href="#">Static top</a></li>
+                    <li class="active"><a href="#">Fixed top</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>

@@ -27,6 +27,10 @@ public class Parser {
     @Autowired
     ObjectMapper objectMapper;
 
+    private static final int PORT_IMDB = 8082;
+    private static final int PORT_TRACKTV = 8081;
+    private static final int PORT_TVRAGE = 8083;
+
     public Show[] parseTVRageData(String data) {
 
         Show[] shows = null;
@@ -61,7 +65,7 @@ public class Parser {
         // extragem link-ul catre rezultate
 
         try {
-            responseEntity = restClient.jsonToObject("http://localhost:8082/movies/" + query);
+            responseEntity = restClient.jsonToObject("http://localhost:" + PORT_IMDB + "/movies/" + query);
         } catch (QueryException e) {
             e.printStackTrace();
         }
@@ -124,7 +128,7 @@ public class Parser {
         // extragem rezultatele
 
         try {
-            responseEntity = restClient.jsonToObject("http://localhost:8081/tracktv?query=" + query);
+            responseEntity = restClient.jsonToObject("http://localhost:" + PORT_TRACKTV + "/tracktv?query=" + query);
         } catch (QueryException e) {
             e.printStackTrace();
         }
@@ -156,7 +160,8 @@ public class Parser {
         while(true) {
 
             try {
-                responseEntity = restClient.jsonToObject("http://localhost:8083/tvrage/query/" + query + "?callback=http://localhost:8080/callback?queried_for=" + query);
+                responseEntity = restClient.jsonToObject("http://localhost:" + PORT_TVRAGE + "/tvrage/query/" +
+                        query + "?callback=http://localhost:8080/callback?queried_for=" + query);
             } catch (QueryException e) {
                 e.printStackTrace();
             } catch (HttpServerErrorException e) {
