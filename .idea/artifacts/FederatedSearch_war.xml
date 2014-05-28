@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="FederatedSearch:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="FederatedSearch.war">
-      <element id="artifact" artifact-name="FederatedSearch:war exploded" />
-    </root>
-  </artifact>
-</component>
