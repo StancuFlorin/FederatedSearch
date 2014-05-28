@@ -96,11 +96,36 @@
 </table>
 
 <ul class="pagination">
-    <li><a href="#">&laquo;</a></li>
+
+    <c:choose>
+        <c:when test="${page != '1'}">
+            <li><a href="/search/results?query=${param["query"]}&page=${page - 1}">&laquo;</a></li>
+        </c:when>
+        <c:otherwise>
+            <li class="disabled"><span>&laquo;<span></li>
+        </c:otherwise>
+    </c:choose>
+
     <c:forEach var="i" begin="1" end="${pages}">
-        <li><a href="/search/results?query=${param["query"]}&page=${i}">${i}</a></li>
+        <c:choose>
+            <c:when test="${page == i}">
+                <li class="active"><span>${i} <span class="sr-only">(current)</span></span></li>
+            </c:when>
+            <c:otherwise>
+                <li><a href="/search/results?query=${param["query"]}&page=${i}"><span>${i}</span></a></li>
+            </c:otherwise>
+        </c:choose>
     </c:forEach>
-    <li><a href="#">&raquo;</a></li>
+
+    <c:choose>
+        <c:when test="${page != pages}">
+            <li><a href="/search/results?query=${param["query"]}&page=${page + 1}">&raquo</a></li>
+        </c:when>
+        <c:otherwise>
+            <li class="disabled"><span>&raquo<span></li>
+        </c:otherwise>
+    </c:choose>
+
 </ul>
 
 <jsp:include page="footer.jsp" />

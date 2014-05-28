@@ -31,6 +31,18 @@ public class Parser {
     private static final int PORT_TRACKTV = 8081;
     private static final int PORT_TVRAGE = 8083;
 
+    /**
+     *
+     * Metoda care-mi returneaza un obiect din raspunsul dat ca parametru.
+     *
+     * @param data
+     * Raspunsul de la serverul "search-provider-with-callback".
+     *
+     * @return
+     * O lista cu obiectele mapate.
+     *
+     */
+
     public Show[] parseTVRageData(String data) {
 
         Show[] shows = null;
@@ -47,8 +59,8 @@ public class Parser {
 
     /**
      *
-     * IMDB server
-     * Server-ul ruleaza pe portul 8082
+     * Metoda care interogheaza si mapeaza raspunsul
+     * dat de serverul "search-provider-with-pooling".
      *
      * @param query
      * Query-ul introdus de utilizator.
@@ -62,7 +74,11 @@ public class Parser {
 
         ResponseEntity<String> responseEntity = null;
 
-        // extragem link-ul catre rezultate
+        /**
+         *
+         * Trimitem cererea catre server si extragem link-ul catre rezultate.
+         *
+         */
 
         try {
             responseEntity = restClient.jsonToObject("http://localhost:" + PORT_IMDB + "/movies/" + query);
@@ -80,7 +96,15 @@ public class Parser {
             e.printStackTrace();
         }
 
-        // extragem rezultatele
+        /**
+         *
+         * Pana aici am extras link-ul cu rezultate si urmeaza sa
+         * interoghez serverul pana cand imi da rezultatele.
+         * Se fac maxim 7 request-uri pentru ca utilizatorul sa nu astepte prea mult.
+         *
+         */
+
+        int requestNumber = 0;
 
         while(true) {
 
@@ -93,11 +117,15 @@ public class Parser {
             if (responseEntity == null)
                 return null;
 
+            requestNumber++;
+
             if (responseEntity.getStatusCode().value() == 200)
                 break;
+            else if (requestNumber == 7)
+                return null;
 
             try {
-                Thread.sleep(400);
+                Thread.sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -105,9 +133,12 @@ public class Parser {
         }
 
         String body = responseEntity.getBody();
-        body = body.replace("–", "-");
 
-        // parsam rezultatele
+        /**
+         *
+         * Mapam rezultatele intr-un obiect.
+         *
+         */
 
         Movie[] movies = null;
 
@@ -121,11 +152,28 @@ public class Parser {
 
     }
 
+    /**
+     *
+     * Metoda care interogheaza si mapeaza raspunsul
+     * dat de serverul "syncwebserver".
+     *
+     * @param query
+     * Query-ul introdus de utilizator.
+     *
+     * @return
+     * Raspunsul dat de server .
+     *
+     */
+
     public TrackTV getTrackTVData(String query) {
 
         ResponseEntity<String> responseEntity = null;
 
-        // extragem rezultatele
+        /**
+         *
+         * Interogam serverul si extragem rezultatele.
+         *
+         */
 
         try {
             responseEntity = restClient.jsonToObject("http://localhost:" + PORT_TRACKTV + "/tracktv?query=" + query);
@@ -136,9 +184,14 @@ public class Parser {
         if (responseEntity == null)
             return null;
 
-        // parsam rezultatele
+        /**
+         *
+         * Mapam rezultatele folosind jackson.
+         *
+         */
 
         TrackTV trackTV = null;
+        // eliminam caractere ciudate care strica maparea jackson
         String body = responseEntity.getBody().replaceAll("[^\\x20-\\x7e]", "");
 
         try {
@@ -151,11 +204,27 @@ public class Parser {
 
     }
 
+    /**
+     *
+     * Metoda care interogheaza serverul "search-provider-with-callback".
+     *
+     * @param query
+     * Query-ul introdus de utilizator.
+     *
+     */
+
     public void getTVRageData(String query) {
 
         ResponseEntity<String> responseEntity = null;
 
-        // trimitem cererea
+        /**
+         *
+         * Trimitem cererea catre server.
+         * Cererea este trimisa de maxim 7 ori in caz ca server-ul nu vrea sa ne raspunda.
+         *
+         */
+
+        int requestNumber = 0;
 
         while(true) {
 
@@ -168,10 +237,14 @@ public class Parser {
                 e.printStackTrace();
             }
 
+            requestNumber++;
+
             if (responseEntity == null)
                 return;
 
             if (responseEntity.getStatusCode().value() == 200)
+                break;
+            else if (requestNumber == 7)
                 break;
 
             try {

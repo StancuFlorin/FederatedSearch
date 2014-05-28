@@ -34,7 +34,7 @@ public class Response {
 
     }
 
-    public synchronized String get(String query) {
+    public String get(String query) {
 
         String response = null;
 

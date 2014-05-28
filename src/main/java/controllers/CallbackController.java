@@ -30,14 +30,26 @@ public class CallbackController {
 
         Show[] shows = null;
 
+        /**
+         *
+         * Parsam raspunsul primit de la serverul
+         * "search-provider-with-callback".
+         *
+         */
+
         try {
             shows = objectMapper.readValue(showInfos, Show[].class);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        /**
+         *
+         * Punem raspunsul intr-o coada.
+         *
+         */
+
         response.add(queried_for, showInfos);
-        System.out.println("Query: " + queried_for);
 
         return "Thanks!";
 

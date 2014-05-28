@@ -5,6 +5,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import java.util.List;
 
 /**
+ * Clasa care mapeaza un serial din raspunsul dat
+ * de serverul "syncwebserver".
+ *
  * Created by fstancu on 5/22/2014.
  */
 
@@ -31,6 +34,16 @@ public class Show {
     private String tvrage_id;
 
     private List<Episode> top_episodes;
+
+    /**
+     *
+     * Transforma un obiect din aceasta clasa intr-un
+     * obiect modelat pentru baza de date.
+     *
+     * @return
+     * Obiectul care se mapeaza in baza de date.
+     *
+     */
 
     public MovieModel toJPAModel() {
 

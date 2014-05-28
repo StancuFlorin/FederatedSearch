@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import rest.Response;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,9 +33,6 @@ public class SearchController {
     Parser parser;
 
     @Autowired
-    MovieService movieService;
-
-    @Autowired
     QueryService queryService;
 
     @Autowired
@@ -42,6 +40,9 @@ public class SearchController {
 
     @Autowired
     Response response;
+
+    @Autowired
+    Util util;
 
     @RequestMapping(value = "/results", method = RequestMethod.GET)
     public String search(@RequestParam String query, @RequestParam(required = false) String page, ModelMap model) {
@@ -53,16 +54,21 @@ public class SearchController {
             pageNumber = 0;
         }
 
-        System.out.println(pageNumber);
-
         List<MovieModel> movieModelList = new ArrayList<MovieModel>();
-
         QueryModel queryModel = queryService.find(query);
+
+        /**
+         * Daca exista in baza de date.
+         */
 
         if (queryModel != null) {
 
             Date date = new Date();
             Long minutes = (date.getTime() - queryModel.getDate().getTime()) / (1000 * 60);
+
+            /**
+             * Si sunt mai vechi de 15 minute.
+             */
 
             if (minutes > 15) {
 
@@ -73,7 +79,16 @@ public class SearchController {
 
         }
 
+        /**
+         * Daca nu mai exista in baza de date.
+         * Daca au exista candva, au fost sterse de instructiunea de mai sus.
+         */
+
         if (queryModel == null) {
+
+            /**
+             * Luam datele de la servere.
+             */
 
             parser.getTVRageData(query);
 
@@ -99,55 +114,16 @@ public class SearchController {
 
             }
 
-            // urmeaza sa fac interclasarea
+            /**
+             * Facem merge pe obiectele din rezultate.
+             */
 
-            Iterator<MovieModel> movieModelListTrackTVIterator = movieModelListTrackTV.iterator();
-            while (movieModelListTrackTVIterator.hasNext()) {
+            movieModelList = util.mergeModels(movieModelListTrackTV, movieModelListIMDB);
+            movieModelList = util.mergeModels(movieModelList, movieModelListTVRage);
 
-                MovieModel movieModelTrackTV = movieModelListTrackTVIterator.next();
-
-                Iterator<MovieModel> movieModelListIMDBIterator = movieModelListIMDB.iterator();
-                while (movieModelListIMDBIterator.hasNext()) {
-
-                    MovieModel movieModelIMDB = movieModelListIMDBIterator.next();
-
-                    if (movieModelTrackTV.equals(movieModelIMDB)) {
-                        movieModelTrackTV.merge(movieModelIMDB);
-                        movieModelListIMDBIterator.remove();
-                        break;
-                    }
-
-                }
-
-                movieModelList.add(movieModelTrackTV);
-
-            }
-
-            movieModelList.addAll(movieModelListIMDB);
-
-            Iterator<MovieModel> movieModelListIterator = movieModelList.iterator();
-            while (movieModelListIterator.hasNext()) {
-
-                MovieModel movieModel = movieModelListIterator.next();
-
-                Iterator<MovieModel> movieModelListTVRageIterator = movieModelListTVRage.iterator();
-                while (movieModelListTVRageIterator.hasNext()) {
-
-                    MovieModel movieModelTVRage = movieModelListTVRageIterator.next();
-
-                    if (movieModel.equals(movieModelTVRage)) {
-                        movieModel.merge(movieModelTVRage);
-                        movieModelListTVRageIterator.remove();
-                        break;
-                    }
-
-                }
-
-            }
-
-            movieModelList.addAll(movieModelListTVRage);
-
-            // sfarsit de interclasare
+            /**
+             * Apoi le salvam in baza de date pentru cache.
+             */
 
             queryModel = new QueryModel();
             queryModel.setQuery(query);
@@ -158,11 +134,19 @@ public class SearchController {
 
         } else {
 
+            /**
+             * Daca exista in baza de date si inca sunt valide.
+             */
+
             movieModelList = queryModel.getMovies();
             if (movieModelList == null)
                 movieModelList = new ArrayList<MovieModel>();
 
         }
+
+        /**
+         * Urmeaza sa facem paginarea.
+         */
 
         int itemsPage = 10;
 
@@ -176,23 +160,21 @@ public class SearchController {
         if (end > movieModelList.size())
             end = movieModelList.size();
 
-        if (start > end) {
+        if (start > end)
             start = end;
-        }
 
         int items = movieModelList.size();
         int pages = items / itemsPage;
         if (items % itemsPage != 0)
             pages++;
 
-        List<MovieModel> movieModelList2 = movieModelList.subList(start, end);
+        List<MovieModel> shortMovieModelList = movieModelList.subList(start, end);
 
         model.addAttribute("title", "Search");
-        model.addAttribute("query", query);
         model.addAttribute("pages", pages);
         model.addAttribute("query", query);
-        model.addAttribute("page", pageNumber + 1);
-        model.addAttribute("movies", movieModelList2);
+        model.addAttribute("page", (pageNumber + 1) +  "");
+        model.addAttribute("movies", shortMovieModelList);
 
         return "list";
 

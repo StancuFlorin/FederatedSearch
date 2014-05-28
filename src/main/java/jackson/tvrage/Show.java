@@ -5,6 +5,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
+ * Clasa care mapeaza raspunsul dat de serverul "search-provider-with-callback".
+ *
  * Created by Florin on 5/24/2014.
  */
 
@@ -28,6 +30,16 @@ public class Show {
     private Network network;
 
     public Show() {}
+
+    /**
+     *
+     * Transforma un obiect din aceasta clasa intr-un
+     * obiect modelat pentru baza de date.
+     *
+     * @return
+     * Obiectul care se mapeaza in baza de date.
+     *
+     */
 
     public MovieModel toJPAModel() {
 

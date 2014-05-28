@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Clasa care mapeaza raspunsul dat de serverul "syncwebserver".
+ *
  * Created by fstancu on 5/22/2014.
  */
 
@@ -17,6 +19,16 @@ public class TrackTV {
     private List<Show> content;
 
     public TrackTV() {}
+
+    /**
+     *
+     * Transforma un obiect din aceasta clasa intr-un
+     * obiect modelat pentru baza de date.
+     *
+     * @return
+     * Obiectul care se mapeaza in baza de date.
+     *
+     */
 
     public List<MovieModel> toJPAModel() {
 

@@ -6,6 +6,9 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 /**
+ * Clasa care mapteaza un obiect de tip "Movie" primit in raspunsul
+ * dat de serverul "search-provider-with-pooling".
+ *
  * Created by fstancu on 5/23/2014.
  */
 
@@ -73,6 +76,16 @@ public class Movie {
     private String writer;
 
     public Movie() {}
+
+    /**
+     *
+     * Transforma un obiect din aceasta clasa intr-un
+     * obiect modelat pentru baza de date.
+     *
+     * @return
+     * Obiectul care se mapeaza in baza de date.
+     *
+     */
 
     public MovieModel toJPAModel() {
 

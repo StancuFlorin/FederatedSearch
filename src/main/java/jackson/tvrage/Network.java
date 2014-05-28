@@ -3,6 +3,9 @@ package jackson.tvrage;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
+ * Clasa care mapeaza un obiect de tip "Network" din
+ * raspunsul dat de serverul "search-provider-with-callback".
+ *
  * Created by Florin on 5/24/2014.
  */
 
