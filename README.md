@@ -2,4 +2,4 @@ FederatedSearch
 ===============
 
 - Verifica "src\main\resources\config.properties" pentru datele de conectare la baza de date.
-- Porneste serverele folosind scrip-ul "servers\runt_all.bat".
+- Porneste serverele folosind script-ul "servers\runt_all.bat".
