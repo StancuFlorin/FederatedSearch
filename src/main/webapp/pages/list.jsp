@@ -55,6 +55,17 @@
                             <i>Plot:</i> ${movie.plot}<br/>
                         </c:if>
                         <hr/>
+
+                        <h3>Top Episodes</h3>
+                        <ol>
+                            <c:forEach var="episode" items="${movie.episodes}">
+                                <li>
+                                    ${episode.title} S${episode.season}E${episode.number}
+                                    <span class="label label-primary" style="float: right;">${episode.plays} plays</span>
+                                </li>
+                            </c:forEach>
+                        </ol>
+
                     </div>
                 </div>
             </div>

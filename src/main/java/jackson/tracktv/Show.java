@@ -1,7 +1,10 @@
 package jackson.tracktv;
 
+import jpa.models.EpisodeModel;
 import jpa.models.MovieModel;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,6 +69,13 @@ public class Show {
         if (stringBuilderGenres.length() != 0)
             stringBuilderGenres.setLength(stringBuilderGenres.length() - 2);
         movieModel.setGenre(stringBuilderGenres.toString());
+
+        List<EpisodeModel> episodeModelSet = new ArrayList<EpisodeModel>();
+        for (Episode episode : this.top_episodes) {
+            episodeModelSet.add(episode.toJPAModel());
+        }
+
+        movieModel.setEpisodes(episodeModelSet);
 
         movieModel.setAirDay(this.air_day);
         movieModel.setAirTime(this.air_time);

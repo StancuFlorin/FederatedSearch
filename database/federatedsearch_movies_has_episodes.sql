@@ -18,44 +18,26 @@ USE `federatedsearch`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `movies`
+-- Table structure for table `movies_has_episodes`
 --
 
-DROP TABLE IF EXISTS `movies`;
+DROP TABLE IF EXISTS `movies_has_episodes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `movies` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) DEFAULT NULL,
-  `year` varchar(45) DEFAULT NULL,
-  `country` varchar(45) DEFAULT NULL,
-  `genre` text,
-  `language` varchar(200) DEFAULT NULL,
-  `poster` text,
-  `released` varchar(45) DEFAULT NULL,
-  `runtime` varchar(45) DEFAULT NULL,
-  `status` varchar(45) DEFAULT NULL,
-  `network` varchar(45) DEFAULT NULL,
-  `plot` text,
-  `rated` varchar(45) DEFAULT NULL,
-  `air_day` varchar(45) DEFAULT NULL,
-  `air_time` varchar(45) DEFAULT NULL,
-  `imdb_id` varchar(45) DEFAULT NULL,
-  `tracktv_url` varchar(200) DEFAULT NULL,
-  `tvrage_id` varchar(45) DEFAULT NULL,
-  `imdb_rating` varchar(45) DEFAULT NULL,
-  `imdb_votes` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2809 DEFAULT CHARSET=utf8;
+CREATE TABLE `movies_has_episodes` (
+  `movie` int(11) NOT NULL,
+  `episode` int(11) NOT NULL,
+  PRIMARY KEY (`movie`,`episode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `movies`
+-- Dumping data for table `movies_has_episodes`
 --
 
-LOCK TABLES `movies` WRITE;
-/*!40000 ALTER TABLE `movies` DISABLE KEYS */;
-/*!40000 ALTER TABLE `movies` ENABLE KEYS */;
+LOCK TABLES `movies_has_episodes` WRITE;
+/*!40000 ALTER TABLE `movies_has_episodes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `movies_has_episodes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

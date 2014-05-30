@@ -1,6 +1,11 @@
 package jpa.models;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "movies", uniqueConstraints = {@UniqueConstraint(columnNames = "id")})
@@ -37,6 +42,12 @@ public class MovieModel {
     private String imdbRating;
     @Column(name = "imdb_votes")
     private String imdbVotes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinTable(name = "movies_has_episodes", joinColumns={@JoinColumn(name="movie", referencedColumnName="id")},
+            inverseJoinColumns={@JoinColumn(name="episode", referencedColumnName="id")})
+    private List<EpisodeModel> episodes;
 
     public MovieModel() {}
 
@@ -86,6 +97,10 @@ public class MovieModel {
 
         if (this.imdbVotes == null)
             this.imdbVotes = movieModel.getImdbVotes();
+
+        if ((this.episodes == null) && (this.episodes.isEmpty())) {
+            this.episodes = movieModel.getEpisodes();
+        }
 
     }
 
@@ -278,4 +293,13 @@ public class MovieModel {
         this.imdbVotes = imdbVotes;
     }
 
+    public List<EpisodeModel> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<EpisodeModel> episodes) {
+
+        this.episodes = episodes;
+
+    }
 }

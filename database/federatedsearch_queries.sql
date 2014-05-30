@@ -30,7 +30,7 @@ CREATE TABLE `queries` (
   `date` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `query_UNIQUE` (`query`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,6 @@ CREATE TABLE `queries` (
 
 LOCK TABLES `queries` WRITE;
 /*!40000 ALTER TABLE `queries` DISABLE KEYS */;
-INSERT INTO `queries` VALUES (36,'parenthood','2014-05-27 12:43:12'),(37,'lost','2014-05-27 13:01:05'),(38,'the walking dead','2014-05-27 13:04:37');
 /*!40000 ALTER TABLE `queries` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-27 16:18:37
+-- Dump completed on 2014-05-30 14:18:37
