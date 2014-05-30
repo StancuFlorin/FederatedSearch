@@ -12,15 +12,15 @@ import java.util.*;
  */
 
 @Component
-public class Response {
+public class CallbackQueueResponse {
 
     private MultiValueMap<String, String> showInfos = new LinkedMultiValueMap<String, String>();
 
-    public Response() {}
+    public CallbackQueueResponse() {}
 
     public void add(String query, String response) {
 
-        synchronized (Response.class) {
+        synchronized (CallbackQueueResponse.class) {
 
             List<String> queryList = this.showInfos.get(query);
             if (queryList != null) {
@@ -38,7 +38,7 @@ public class Response {
 
         String response = null;
 
-        synchronized (Response.class) {
+        synchronized (CallbackQueueResponse.class) {
 
             List<String> responseList = (List<String>) showInfos.get(query);
 

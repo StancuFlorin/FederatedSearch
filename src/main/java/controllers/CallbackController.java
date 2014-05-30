@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import rest.Response;
+import rest.CallbackQueueResponse;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class CallbackController {
     ObjectMapper objectMapper;
 
     @Autowired
-    Response response;
+    CallbackQueueResponse callbackQueueResponse;
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
@@ -31,10 +31,8 @@ public class CallbackController {
         Show[] shows = null;
 
         /**
-         *
          * Parsam raspunsul primit de la serverul
          * "search-provider-with-callback".
-         *
          */
 
         try {
@@ -44,12 +42,10 @@ public class CallbackController {
         }
 
         /**
-         *
          * Punem raspunsul intr-o coada.
-         *
          */
 
-        response.add(queried_for, showInfos);
+        callbackQueueResponse.add(queried_for, showInfos);
 
         return "Thanks!";
 

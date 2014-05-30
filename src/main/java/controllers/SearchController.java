@@ -6,19 +6,17 @@ import jackson.tracktv.TrackTV;
 import jackson.tvrage.Show;
 import jpa.models.MovieModel;
 import jpa.models.QueryModel;
-import jpa.service.MovieService;
 import jpa.service.QueryService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import rest.Response;
+import rest.CallbackQueueResponse;
 import util.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,7 +37,7 @@ public class SearchController {
     ObjectMapper objectMapper;
 
     @Autowired
-    Response response;
+    CallbackQueueResponse callbackQueueResponse;
 
     @Autowired
     Util util;
@@ -90,7 +88,15 @@ public class SearchController {
              * Luam datele de la servere.
              */
 
+            /**
+             * Trimitem cererea catre "search-provider-with-callback".
+             */
+
             parser.getTVRageData(query);
+
+            /**
+             * Luam datele de pe "syncwebserver".
+             */
 
             TrackTV trackTV = parser.getTrackTVData(query);
             List<MovieModel> movieModelListTrackTV = new ArrayList<MovieModel>();
@@ -98,13 +104,21 @@ public class SearchController {
                 for (MovieModel movieModel : trackTV.toJPAModel())
                     movieModelListTrackTV.add(movieModel);
 
+            /**
+             * Luam datele de pe "search-provider-with-pooling".
+             */
+
             Movie[] movies = parser.getIMDBData(query);
             List<MovieModel> movieModelListIMDB = new ArrayList<MovieModel>();
             if (movies != null)
                 for (Movie movie : movies)
                     movieModelListIMDB.add(movie.toJPAModel());
 
-            String data = response.get(query);
+            /**
+             * Luam raspunsul de pa "search-provider-with-callback".
+             */
+
+            String data = callbackQueueResponse.get(query);
             List<MovieModel> movieModelListTVRage = new ArrayList<MovieModel>();
             if (data != null) {
 
@@ -167,6 +181,11 @@ public class SearchController {
         int pages = items / itemsPage;
         if (items % itemsPage != 0)
             pages++;
+
+        /**
+         * Lucrul asta nu e prea frumos. Trebuia sa fac paginarea din cererea SQL,
+         * dar inca nu stiu indeajuns JPA.
+         */
 
         List<MovieModel> shortMovieModelList = movieModelList.subList(start, end);
 
